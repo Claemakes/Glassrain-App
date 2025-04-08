@@ -532,5 +532,24 @@
                 document.getElementById('submit-button').disabled = true;
             });
     </script>
+<script>
+    // ✅ Mapbox Access Token
+    mapboxgl.accessToken = 
+'pk.eyJ1IjoiY2xhZWdsYXNzcmFpbm1pIiwiYSI6ImNtODZzYXpkbDA3cTQyanB4bWoxcDBsZWgifQ.iOrdt1dHQ4441Z0BGzmRbg';
+
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        placeholder: 'Enter your home address',
+        mapboxgl: mapboxgl
+    });
+
+    document.getElementById('geocoder').appendChild(geocoder.onAdd(mapboxgl));
+
+    // 🔽 Preload address from Flask if available
+    {% if address %}
+        geocoder.setInput("{{ address }}");
+    {% endif %}
+</script>
+
 </body>
 </html>
