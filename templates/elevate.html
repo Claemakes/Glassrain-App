@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassRain - Elevate Shop</title>
+    <style>
+        /* GlassRain Color Scheme */
+        :root {
+            --glassrain-gold: #C29E49;
+            --midnight-black: #1A1A1A;
+            --rain-slate: #2E2E2E;
+            --cloud-white: #F8F8F8;
+            --mist-gray: #E5E5E5;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cloud-white);
+            color: var(--midnight-black);
+        }
+        
+        /* Blueprint Styles */
+        .blueprint-container {
+            background-color: #f8f9fa;
+            padding: 40px 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .blueprint-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .blueprint-title {
+            font-size: 28px;
+            color: var(--midnight-black);
+            margin-bottom: 8px;
+        }
+        
+        .blueprint-subtitle {
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .blueprint-layout {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 30px;
+        }
+        
+        .blueprint-map {
+            flex: 1;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .blueprint-info {
+            width: 300px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+        
+        .blueprint-floor {
+            background-color: #e5e7eb;
+            border: 2px solid #d1d5db;
+            height: 100%;
+            border-radius: 6px;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .room {
+            position: absolute;
+            background-color: #e9ecef;
+            border: 2px solid #adb5bd;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .room-scanned {
+            background-color: rgba(194, 158, 73, 0.2);
+            border-color: var(--glassrain-gold);
+        }
+        
+        .room[data-room="living"] {
+            width: 40%;
+            height: 35%;
+            top: 20%;
+            left: 10%;
+        }
+        
+        .room[data-room="kitchen"] {
+            width: 30%;
+            height: 25%;
+            top: 20%;
+            right: 10%;
+        }
+        
+        .room[data-room="bedroom1"] {
+            width: 25%;
+            height: 30%;
+            bottom: 10%;
+            left: 15%;
+        }
+        
+        .room[data-room="bedroom2"] {
+            width: 20%;
+            height: 25%;
+            bottom: 10%;
+            left: 45%;
+        }
+        
+        .room[data-room="bathroom"] {
+            width: 15%;
+            height: 20%;
+            bottom: 15%;
+            right: 10%;
+        }
+        
+        .room-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .room-status {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .room-scanned .room-status {
+            color: var(--glassrain-gold);
+        }
+        
+        .home-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--midnight-black);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .scan-room-btn {
+            width: 100%;
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .scan-room-btn:hover {
+            background-color: #d4b05e;
+        }
+        
+        .scan-info {
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        @media (max-width: 768px) {
+            .blueprint-layout {
+                flex-direction: column;
+            }
+            
+            .blueprint-map {
+                min-height: 300px;
+            }
+            
+            .blueprint-info {
+                width: 100%;
+            }
+        }
+
+        /* Header */
+        header {
+            background-color: var(--midnight-black);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--glassrain-gold);
+        }
+
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-tab {
+            padding: 8px 15px;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--glassrain-gold);
+        }
+
+        .nav-tab.active {
+            color: var(--glassrain-gold);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--glassrain-gold);
+        }
+
+        .cart-icon {
+            position: relative;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        .saved-items-icon {
+            position: relative;
+            margin-left: 15px;
+            display: inline-block;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .saved-items-icon:hover {
+            color: var(--glassrain-gold);
+        }
+
+        .cart-count, .saved-items-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 12px;
+            background: var(--glassrain-gold);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+            right: -5px;
+            font-size: 12px;
+            background: var(--glassrain-gold);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 58px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--rain-slate);
+            color: white;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--glassrain-gold);
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-option input {
+            margin: 0;
+        }
+
+        /* Shop Content */
+        .shop-container {
+            flex-grow: 1;
+            padding: 30px;
+        }
+
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .shop-title {
+            font-size: 28px;
+            color: var(--midnight-black);
+        }
+
+        .view-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-option {
+            background-color: var(--mist-gray);
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .view-option.active {
+            background-color: var(--rain-slate);
+            color: white;
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .store-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--midnight-black);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .sale-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #EF4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-details {
+            padding: 15px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .current-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--midnight-black);
+        }
+
+        .original-price {
+            font-size: 14px;
+            color: #777;
+            text-decoration: line-through;
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-grow: 1;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #d4b05e;
+        }
+
+        .view-details-btn {
+            background-color: var(--mist-gray);
+            color: var(--midnight-black);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-left: 8px;
+        }
+
+        .view-details-btn:hover {
+            background-color: #d0d0d0;
+        /* Shopping Cart and Saved Items */
+        .cart-panel, .saved-items-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: right 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-panel.open, .saved-items-panel.open {
+            right: 0;
+        }
+
+        .cart-icon-wrapper, .saved-items-icon-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .cart-icon-wrapper, .saved-items-icon-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .saved-items-icon {
+            display: inline-block;
+            font-size: 20px;
+            color: #4F46E5;
+        }
+        
+        .cart-count, .saved-items-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 12px;
+            background: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .saved-items-count {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .cart-header {
+            background-color: var(--midnight-black);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .cart-store {
+            margin-bottom: 25px;
+        }
+
+        .cart-store-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cart-store-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .cart-store-logo {
+            width: 24px;
+            height: 24px;
+        }
+
+        .cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            padding: 10px;
+            background-color: var(--mist-gray);
+            border-radius: 6px;
+        }
+
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .cart-item-details {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: var(--midnight-black);
+            font-weight: bold;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .quantity-btn {
+            width: 20px;
+            height: 20px;
+            background-color: var(--rain-slate);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #EF4444;
+            cursor: pointer;
+            margin-left: auto;
+            font-size: 18px;
+        }
+
+        .cart-store-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-weight: bold;
+        }
+
+        /* Saved Items Styles */
+        .saved-items-header {
+            background-color: #4F46E5;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .saved-items-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .saved-items-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .empty-saved-message {
+            text-align: center;
+            color: #6B7280;
+            margin-top: 30px;
+            font-size: 16px;
+        }
+
+        .saved-store {
+            margin-bottom: 20px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .saved-store-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #F9FAFB;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .saved-store-logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            object-fit: contain;
+        }
+
+        .saved-store-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .saved-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid #F3F4F6;
+            position: relative;
+        }
+
+        .saved-item:last-child {
+            border-bottom: none;
+        }
+
+        .saved-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .saved-item-details {
+            flex-grow: 1;
+        }
+
+        .saved-item-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .saved-item-price {
+            color: var(--midnight-black);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .saved-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .add-to-cart-btn, .view-details-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+        }
+
+        .view-details-btn {
+            background-color: #E5E7EB;
+            color: #4B5563;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #B38B38;
+            color: white;
+        }
+
+        .view-details-btn:hover {
+            background-color: #D1D5DB;
+        }
+
+        .saved-item-remove {
+            background: none;
+            border: none;
+            color: #EF4444;
+            cursor: pointer;
+            font-size: 18px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .save-for-later-btn {
+            background: none;
+            border: none;
+            color: #4F46E5;
+            padding: 0;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 5px;
+        }
+
+        .save-for-later-btn:hover {
+            color: #4338CA;
+        }
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            background-color: var(--mist-gray);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .checkout-btn:hover {
+            background-color: #d4b05e;
+        }
+
+        .checkout-options {
+            margin-top: 15px;
+        }
+
+        .checkout-option {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .checkout-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .checkout-option-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-option-logo {
+            width: 20px;
+            height: 20px;
+        }
+
+        .checkout-option-arrow {
+            font-size: 18px;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .shop-container {
+                padding: 15px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+
+        .saved-items-panel {
+            position: fixed;
+            top: 0;
+            right: -400px; /* Start off-screen */
+            width: 380px;
+            height: 100%;
+            background-color: #fff;
+            box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 1001;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .saved-items-panel.active {
+            right: 0;
+        }
+
+        .saved-items-header {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+
+        .saved-items-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .close-saved-items {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .saved-items-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .empty-saved-items-message {
+            text-align: center;
+            color: #888;
+            padding: 30px 0;
+            font-size: 16px;
+        }
+
+        .saved-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .saved-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 15px;
+            background-color: #f0f0f0;
+        }
+
+        .saved-item-details {
+            flex: 1;
+        }
+
+        .saved-item-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .saved-item-price {
+            color: #C29E49;
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .saved-item-store {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .saved-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .move-to-cart-btn, .remove-saved-btn {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .move-to-cart-btn {
+            color: #C29E49;
+            border-color: #C29E49;
+        }
+
+        .move-to-cart-btn:hover {
+            background-color: #C29E49;
+            color: white;
+        }
+
+        .remove-saved-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .saved-items-footer {
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .view-all-saved-btn {
+            background-color: #2E2E2E;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        .view-all-saved-btn:hover {
+            background-color: #1A1A1A;
+        }
+
+            .cart-panel {
+                width: 300px;
+            }
+        }
+        /* Store Products Display Styles */
+        .store-products-container {
+            margin: 40px auto;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: white;
+            border: 2px solid var(--glassrain-gold);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(194, 158, 73, 0.2);
+        }
+        
+        .store-products-header {
+            margin-bottom: 20px;
+        }
+        
+        .store-products-header h2 {
+            color: var(--midnight-black);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .store-search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .store-search-input {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .store-search-filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .store-filter-select, .product-filter-select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 14px;
+        }
+        
+        .store-products-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+        
+        .store-product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .store-product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .store-product-image {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+            background-color: #f9f9f9;
+        }
+        
+        .store-product-details {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .store-product-name {
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .store-product-price {
+            color: var(--glassrain-gold);
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .store-product-store {
+            color: #666;
+            font-size: 12px;
+            margin-top: auto;
+        }
+        
+        .store-product-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .store-add-to-cart-btn {
+            flex: 3;
+            background-color: var(--glassrain-gold);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .store-add-to-cart-btn:hover {
+            background-color: #d4b05e;
+        }
+        
+        .store-view-details-btn {
+            flex: 2;
+            background-color: var(--rain-slate);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .store-view-details-btn:hover {
+            background-color: var(--midnight-black);
+        }
+        
+        @media (max-width: 1024px) {
+            .store-products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .store-products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .store-search-filters {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .store-products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Store Products Display Styles */
+        .store-products-container {
+            margin: 40px auto;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: white;
+            border: 2px solid var(--glassrain-gold);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(194, 158, 73, 0.2);
+        }
+        
+        .store-products-header {
+            margin-bottom: 20px;
+        }
+        
+        .store-products-header h2 {
+            color: var(--midnight-black);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .store-search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .store-search-input {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .store-search-filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .store-filter-select, .product-filter-select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 14px;
+        }
+        
+        .store-products-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+        
+        .store-product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .store-product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .store-product-image {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+            background-color: #f9f9f9;
+        }
+        
+        .store-product-details {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .store-product-name {
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .store-product-price {
+            color: var(--glassrain-gold);
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .store-product-store {
+            color: #666;
+            font-size: 12px;
+            margin-top: auto;
+        }
+        
+        .store-product-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .store-add-to-cart-btn {
+            flex: 3;
+            background-color: var(--glassrain-gold);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .store-add-to-cart-btn:hover {
+            background-color: #d4b05e;
+        }
+        
+        .store-view-details-btn {
+            flex: 2;
+            background-color: var(--rain-slate);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .store-view-details-btn:hover {
+            background-color: var(--midnight-black);
+        }
+        
+        .loading-indicator, .error-message, .no-products-message {
+            padding: 20px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        
+        .loading-indicator {
+            color: var(--rain-slate);
+        }
+        
+        .error-message {
+            color: #e53e3e;
+        }
+        
+        .no-products-message {
+            color: #718096;
+        }
+        
+        @media (max-width: 1024px) {
+            .store-products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .store-products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .store-search-filters {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .store-products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">GlassRain</div>
+        <nav class="nav-tabs">
+            <a href="/dashboard" class="nav-tab">Home</a>
+            <a href="/elevate" class="nav-tab active">Elevate</a>
+            <a href="/services" class="nav-tab">Services</a>
+            <a href="/diy" class="nav-tab">DIY</a>
+            <a href="/settings" class="nav-tab">Account</a>
+            <div class="saved-items-icon-wrapper" onclick="toggleSavedItems()">
+                <div class="saved-items-icon">💾</div>
+                <span class="saved-items-count" id="saved-items-count">0</span>
+            </div><!-- End of cart panel -->
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 <span class="cart-count" id="cart-count">0</span>
+            </div><!-- End of cart panel -->
+        </nav>
+    </header>
+
+    <!-- Home Blueprint Section -->
+    <div class="blueprint-container">
+        <div class="blueprint-header">
+            <h2 class="blueprint-title">Your Home Blueprint</h2>
+            <p class="blueprint-subtitle">Explore your home layout and scan rooms for 3D visualization</p>
+        </div>
+        
+        <div class="blueprint-layout">
+            <div class="blueprint-map">
+                <div class="blueprint-floor">
+                    <div class="room room-scanned" data-room="living">
+                        <span class="room-name">Living Room</span>
+                        <div class="room-status">Scanned</div>
+                    </div>
+                    <div class="room" data-room="kitchen">
+                        <span class="room-name">Kitchen</span>
+                        <div class="room-status">Not Scanned</div>
+                    </div>
+                    <div class="room" data-room="bedroom1">
+                        <span class="room-name">Main Bedroom</span>
+                        <div class="room-status">Not Scanned</div>
+                    </div>
+                    <div class="room" data-room="bedroom2">
+                        <span class="room-name">Guest Bedroom</span>
+                        <div class="room-status">Not Scanned</div>
+                    </div>
+                    <div class="room" data-room="bathroom">
+                        <span class="room-name">Bathroom</span>
+                        <div class="room-status">Not Scanned</div>
+                    </div>
+                </div>
+            </div>
+            <div class="blueprint-info">
+                <h3>Home Details</h3>
+                <div class="home-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">1,850 sq.ft</div>
+                        <div class="stat-label">Total Area</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Rooms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1/5</div>
+                        <div class="stat-label">Rooms Scanned</div>
+                    </div>
+                </div>
+                <button class="scan-room-btn">
+                    <i class="fas fa-camera"></i>
+                    Scan New Room
+                </button>
+                <p class="scan-info">Use your phone to scan rooms for a complete 3D model</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Filters</h3>
+            
+            <div class="filter-group">
+                <span class="filter-label">Store</span>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="store" value="all" checked> All Stores
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="store" value="ikea"> IKEA
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="store" value="home-depot"> Home Depot
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="store" value="lowes"> Lowe's
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="store" value="wayfair"> Wayfair
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="store" value="amazon"> Amazon Home
+                    </label>
+                </div><!-- End of cart panel -->
+            </div><!-- End of cart panel -->
+            
+            <div class="filter-group">
+                <span class="filter-label">Category</span>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="all" checked> All Categories
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="furniture"> Furniture
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="lighting"> Lighting
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="kitchen"> Kitchen
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="bathroom"> Bathroom
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="garden"> Garden
+                    </label>
+                </div><!-- End of cart panel -->
+            </div><!-- End of cart panel -->
+            
+            <div class="filter-group">
+                <span class="filter-label">Price Range</span>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="all" checked> All Prices
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="under-50"> Under $50
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="50-100"> $50 - $100
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="100-200"> $100 - $200
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="200-500"> $200 - $500
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="500+"> $500+
+                    </label>
+                </div><!-- End of cart panel -->
+            </div><!-- End of cart panel -->
+            
+            <div class="filter-group">
+                <span class="filter-label">Sale Items</span>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="sale" value="on-sale"> On Sale
+                    </label>
+                </div><!-- End of cart panel -->
+            </div><!-- End of cart panel -->
+        </aside>
+
+        <main class="shop-container">
+    <!-- Store Products Display (appears after room scan) -->
+    <div class="store-products-container" id="store-products-container" style="display: none;">
+        <div class="store-products-header">
+            <h2>Recommended Products for Your Room</h2>
+            <div class="store-search-container">
+                <input type="text" id="store-search" class="store-search-input" placeholder="Search products or stores...">
+                <div class="store-search-filters">
+                    <select id="store-filter" class="store-filter-select">
+                        <option value="all">All Stores</option>
+                        <option value="ikea">IKEA</option>
+                        <option value="home-depot">Home Depot</option>
+                        <option value="lowes">Lowe's</option>
+                        <option value="wayfair">Wayfair</option>
+                        <option value="amazon">Amazon Home</option>
+                    </select>
+                    <select id="product-filter" class="product-filter-select">
+                        <option value="all">All Products</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="lighting">Lighting</option>
+                        <option value="decor">Decor</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="store-products-grid" id="store-products-grid">
+            <!-- Products will be displayed here after room scan -->
+        </div>
+    </div>
+            <div class="shop-header">
+                <h1 class="shop-title">Elevate Your Home</h1>
+                <div class="view-options">
+                    <button class="view-option active">Grid</button>
+                    <button class="view-option">List</button>
+                </div><!-- End of cart panel -->
+            </div><!-- End of cart panel -->
+
+            <div class="products-grid" id="products-container">
+                <!-- Products will be loaded here via JavaScript -->
+                <div class="loading-placeholder">Loading products...</div>
+            </div><!-- End of cart panel -->
+        </main>
+    <!-- Store Products Display (appears after room scan) -->
+    <div class="store-products-container" id="store-products-container" style="display: none;">
+        <div class="store-products-header">
+            <h2>Recommended Products for Your Room</h2>
+            <div class="store-search-container">
+                <input type="text" id="store-search" class="store-search-input" placeholder="Search products or stores...">
+                <div class="store-search-filters">
+                    <select id="store-filter" class="store-filter-select">
+                        <option value="all">All Stores</option>
+                        <option value="ikea">IKEA</option>
+                        <option value="home-depot">Home Depot</option>
+                        <option value="lowes">Lowe's</option>
+                        <option value="wayfair">Wayfair</option>
+                        <option value="amazon">Amazon Home</option>
+                    </select>
+                    <select id="product-filter" class="product-filter-select">
+                        <option value="all">All Products</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="lighting">Lighting</option>
+                        <option value="decor">Decor</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="store-products-grid" id="store-products-grid">
+            <!-- 5 products will be displayed here after room scan -->
+        </div>
+    </div>
+    </div><!-- End of cart panel -->
+    
+    <!-- Store Products Display (appears after room scan) -->
+    <div class="store-products-container" id="store-products-container" style="display: none;">
+        <div class="store-products-header">
+            <h2>Recommended Products for Your Room</h2>
+            <div class="store-search-container">
+                <input type="text" id="store-search" class="store-search-input" placeholder="Search products or stores...">
+                <div class="store-search-filters">
+                    <select id="store-filter" class="store-filter-select">
+                        <option value="all">All Stores</option>
+                        <option value="ikea">IKEA</option>
+                        <option value="home-depot">Home Depot</option>
+                        <option value="lowes">Lowe's</option>
+                        <option value="wayfair">Wayfair</option>
+                        <option value="amazon">Amazon Home</option>
+                    </select>
+                    <select id="product-filter" class="product-filter-select">
+                        <option value="all">All Products</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="lighting">Lighting</option>
+                        <option value="decor">Decor</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="store-products-grid" id="store-products-grid">
+            <!-- 5 products will be displayed here after room scan -->
+        </div>
+    </div>
+    
+    <!-- Store Products Display (appears after room scan) -->
+    <div class="store-products-container" id="store-products-container" style="display: none;">
+        <div class="store-products-header">
+            <h2>Recommended Products for Your Room</h2>
+            <div class="store-search-container">
+                <input type="text" id="store-search" class="store-search-input" placeholder="Search products or stores...">
+                <div class="store-search-filters">
+                    <select id="store-filter" class="store-filter-select">
+                        <option value="all">All Stores</option>
+                        <option value="ikea">IKEA</option>
+                        <option value="home-depot">Home Depot</option>
+                        <option value="lowes">Lowe's</option>
+                        <option value="wayfair">Wayfair</option>
+                        <option value="amazon">Amazon Home</option>
+                    </select>
+                    <select id="product-filter" class="product-filter-select">
+                        <option value="all">All Products</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="lighting">Lighting</option>
+                        <option value="decor">Decor</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="store-products-grid" id="store-products-grid">
+            <!-- 5 products will be displayed here after room scan -->
+        </div>
+    </div>
+
+    <!-- Shopping Cart Panel -->
+    <div class="overlay" onclick="toggleCart()"></div>
+    <div class="cart-panel" id="cart-panel">
+        <div class="cart-header">
+            <span class="cart-title">Shopping Cart</span>
+            <button class="close-cart" onclick="toggleCart()">✕</button>
+        </div><!-- End of cart panel -->
+        
+        <div class="cart-content" id="cart-content">
+            <div class="empty-cart-message" id="empty-cart-message">
+                Your cart is empty
+            </div><!-- End of cart panel -->
+            <!-- Cart items will be added here via JavaScript -->
+        </div><!-- End of cart panel -->
+        
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total">$0.00</span>
+            </div><!-- End of cart panel -->
+            
+            <button class="checkout-btn" onclick="checkout()" disabled id="checkout-btn">Proceed to Checkout</button>
+            
+            <div class="checkout-options" id="checkout-options" style="display: none;">
+                <!-- Checkout options will be added here via JavaScript -->
+            </div><!-- End of cart panel -->
+        </div><!-- End of cart panel -->
+    </div><!-- End of cart panel -->
+
+    <!-- Saved Items Panel -->
+    <div class="saved-items-panel" id="saved-items-panel" style="display: none;">
+        <div class="saved-items-header">
+            <span class="saved-items-title">Saved for Later</span>
+            <button class="close-saved-items" onclick="toggleSavedItems()">✕</button>
+        </div>
+        
+        <div class="saved-items-content" id="saved-items-content">
+            <div class="empty-saved-items-message" id="empty-saved-items-message">
+                You don't have any saved items
+            </div>
+            <!-- Saved items will be added here via JavaScript -->
+        </div>
+        
+        <div class="saved-items-footer">
+            <button class="view-all-saved-btn" onclick="toggleSavedItems()">Close</button>
+        </div>
+    </div>
+    <!-- Load cart and retailer integration scripts -->
+        // Room scanning functionality
+        document.querySelector(".scan-room-btn").addEventListener("click", function() {
+            // Show scanning animation/progress
+            const roomToScan = document.querySelector(".room:not(.room-scanned)");
+            if (roomToScan) {
+                // Simulate scanning process
+                alert("Scanning room: " + roomToScan.querySelector(".room-name").textContent);
+                
+                // After scanning is complete (simulated with setTimeout)
+                setTimeout(function() {
+                    // Mark room as scanned
+                    roomToScan.classList.add("room-scanned");
+                    
+                    // Update scanned room count
+                    const scannedRooms = document.querySelectorAll(".room.room-scanned").length;
+                    const totalRooms = document.querySelectorAll(".room").length;
+                    document.querySelector(".stat-value:nth-child(3)").textContent = scannedRooms + "/" + totalRooms;
+                    
+                    // Generate recommended products for the room
+                    showRecommendedProducts(roomToScan.dataset.room);
+                }, 1500);
+            } else {
+                alert("All rooms have been scanned!");
+            }
+        });
+        
+        // Function to display recommended products
+                            : `<span class="current-price">$${product.price.toFixed(2)}</span>`;
+        // Function to display recommended products
+        function showRecommendedProducts(roomType) {
+            // Display the store products container
+            const storeProductsContainer = document.getElementById("store-products-container");
+            storeProductsContainer.style.display = "block";
+            
+            // Clear existing products
+            const storeProductsGrid = document.getElementById("store-products-grid");
+            storeProductsGrid.innerHTML = "";
+            
+            // Show loading state
+            storeProductsGrid.innerHTML = '<div class="loading-indicator">Loading recommended products...</div>';
+            
+            // Fetch recommended products for the room type
+            fetch("/api/recommended_products?room=" + roomType + "&limit=5")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Clear loading indicator
+                    storeProductsGrid.innerHTML = "";
+                    
+                    if (!data.products || data.products.length === 0) {
+                        storeProductsGrid.innerHTML = '<div class="no-products-message">No products found for this room type.</div>';
+                        return;
+                    }
+                    
+                    // Add products to the grid (max 5)
+                    const recommendedProducts = data.products.slice(0, 5);
+                    
+                    recommendedProducts.forEach(product => {
+                        const productCard = document.createElement("div");
+                        productCard.className = "store-product-card";
+                        productCard.dataset.store = product.store_name ? product.store_name.toLowerCase() : '';
+                        productCard.dataset.product = product.name ? product.name.toLowerCase() : '';
+                        
+                        // Prepare price display logic
+                        let priceDisplay;
+                        if (product.is_on_sale && product.sale_price) {
+                            priceDisplay = `
+                                <span class="current-price">$${parseFloat(product.sale_price).toFixed(2)}</span>
+                                <span class="original-price">$${parseFloat(product.price).toFixed(2)}</span>
+                            `;
+                        } else {
+                            priceDisplay = `<span class="current-price">$${parseFloat(product.price).toFixed(2)}</span>`;
+                        }
+                        
+                        // Set a default image if none provided
+                        const imageUrl = product.image_url || '/static/img/product-placeholder.jpg';
+                        
+                        // Prepare store name
+                        const storeName = product.store_name || product.store || 'Unknown Store';
+                        
+                        // Create HTML content with proper escaping and formatting
+                        productCard.innerHTML = `
+                            <img src="${imageUrl}" alt="${escapeHtml(product.name)}" class="store-product-image">
+                            <div class="store-product-details">
+                                <div class="store-product-name">${escapeHtml(product.name)}</div>
+                                <div class="store-product-price">${priceDisplay}</div>
+                                <div class="store-product-store">${escapeHtml(storeName)}</div>
+                                <div class="store-product-actions">
+                                    <button class="store-add-to-cart-btn" onclick="addToCart(${product.id})">
+                                        Add to Cart
+                                    </button>
+                                    <button class="store-view-details-btn" onclick="window.open('${escapeHtml(product.product_url || '#')}', '_blank')">
+                                        Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        storeProductsGrid.appendChild(productCard);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading recommended products:", error);
+                    storeProductsGrid.innerHTML = 
+                        '<div class="error-message">Failed to load recommended products. Please try again later.</div>';
+                });
+                
+            // Scroll to the recommendations
+            storeProductsContainer.scrollIntoView({ behavior: "smooth" });
+        }
+        
+        // Helper function to escape HTML to prevent XSS
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Function to add product to cart
+        function addToCart(productId) {
+            if (typeof Cart !== 'undefined' && Cart.addItem) {
+                // First get product details
+                fetch(`/api/products/${productId}`)
+                    .then(response => response.json())
+                    .then(product => {
+                        Cart.addItem(product);
+                        alert(`Added ${product.name} to your cart!`);
+                    })
+                    .catch(err => {
+                        console.error("Error adding to cart:", err);
+                        // Fallback for testing
+                        alert("Product added to cart!");
+                    });
+            } else {
+                console.warn("Cart functionality not available");
+                alert("Product added to cart!");
+            }
+        }
+        
+        // Function to view product details
+        function viewProductDetails(url) {
+            if (url && url !== '#') {
+                window.open(url, '_blank');
+            } else {
+                alert("Product details not available");
+            }
+        }
+                        
+                        productCard.innerHTML = `
+                            <img src="${product.image_url}" alt="${product.name}" class="store-product-image">
+                            <div class="store-product-details">
+                                <div class="store-product-name">${product.name}</div>
+                                <div class="store-product-price">${priceDisplay}</div>
+                                <div class="store-product-store">${product.store_name}</div>
+                                <div class="store-product-actions">
+                                    <button class="store-add-to-cart-btn" onclick="Cart.addItem(${JSON.stringify(product).replace(/"/g, "&quot;")})>
+                                        Add to Cart
+                                    </button>
+                                    <button class="store-view-details-btn" onclick="window.open('${product.product_url}', '_blank')>
+                                        Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        storeProductsGrid.appendChild(productCard);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading recommended products:", error);
+                    storeProductsGrid.innerHTML = 
+                        '<div class="error-message">Failed to load recommended products. Please try again later.</div>';
+                });
+                
+            // Scroll to the recommendations
+            storeProductsContainer.scrollIntoView({ behavior: "smooth" });
+        }
+        
+        // Search and filter functionality
+        document.getElementById("store-search").addEventListener("input", filterProducts);
+        document.getElementById("store-filter").addEventListener("change", filterProducts);
+        document.getElementById("product-filter").addEventListener("change", filterProducts);
+        
+        function filterProducts() {
+            const searchTerm = document.getElementById("store-search").value.toLowerCase();
+            const storeFilter = document.getElementById("store-filter").value;
+            const productFilter = document.getElementById("product-filter").value;
+            
+            const productCards = document.querySelectorAll(".store-product-card");
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector(".store-product-name").textContent.toLowerCase();
+                const storeName = card.querySelector(".store-product-store").textContent.toLowerCase();
+                
+                const matchesSearch = productName.includes(searchTerm) || storeName.includes(searchTerm);
+                const matchesStore = storeFilter === "all" || storeName.includes(storeFilter.replace("-", " "));
+                const matchesProduct = productFilter === "all" || productName.includes(productFilter);
+                
+                if (matchesSearch && matchesStore && matchesProduct) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+        // Search and filter functionality
+        document.getElementById("store-search").addEventListener("input", filterProducts);
+        document.getElementById("store-filter").addEventListener("change", filterProducts);
+        document.getElementById("product-filter").addEventListener("change", filterProducts);
+        
+        function filterProducts() {
+            const searchTerm = document.getElementById("store-search").value.toLowerCase();
+            const storeFilter = document.getElementById("store-filter").value;
+            const productFilter = document.getElementById("product-filter").value;
+            
+            const productCards = document.querySelectorAll(".store-product-card");
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector(".store-product-name").textContent.toLowerCase();
+                const storeName = card.querySelector(".store-product-store").textContent.toLowerCase();
+                
+                const matchesSearch = productName.includes(searchTerm) || storeName.includes(searchTerm);
+                const matchesStore = storeFilter === "all" || storeName.includes(storeFilter.replace("-", " "));
+                const matchesProduct = productFilter === "all" || productName.includes(productFilter);
+                
+                if (matchesSearch && matchesStore && matchesProduct) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    <script src="{{ url_for('static', filename='js/retailer_integration.js') }}"></script>
+        // Room scanning functionality
+        document.querySelector(".scan-room-btn").addEventListener("click", function() {
+            // Show scanning animation/progress
+            const roomToScan = document.querySelector(".room:not(.room-scanned)");
+            if (roomToScan) {
+                // Simulate scanning process
+                alert("Scanning room: " + roomToScan.querySelector(".room-name").textContent);
+                
+                // After scanning is complete (simulated with setTimeout)
+                setTimeout(function() {
+                    // Mark room as scanned
+                    roomToScan.classList.add("room-scanned");
+                    
+                    // Update scanned room count
+                    const scannedRooms = document.querySelectorAll(".room.room-scanned").length;
+                    const totalRooms = document.querySelectorAll(".room").length;
+                    document.querySelector(".stat-value:nth-child(3)").textContent = scannedRooms + "/" + totalRooms;
+                    
+                    // Generate recommended products for the room
+                    showRecommendedProducts(roomToScan.dataset.room);
+                }, 1500);
+            } else {
+                alert("All rooms have been scanned!");
+            }
+        });
+        
+        // Function to display recommended products
+        function showRecommendedProducts(roomType) {
+            // Display the store products container
+            const storeProductsContainer = document.getElementById("store-products-container");
+            storeProductsContainer.style.display = "block";
+            
+            // Clear existing products
+            const storeProductsGrid = document.getElementById("store-products-grid");
+            storeProductsGrid.innerHTML = "";
+            
+            // Fetch recommended products for the room type
+            // For now, we'll use some sample data
+            fetch("/api/recommended_products?room=" + roomType)
+                .then(response => response.json())
+                .then(data => {
+                    const recommendedProducts = data.products.slice(0, 5); // Only show 5 products
+                    
+                    // Add products to the grid
+                    recommendedProducts.forEach(product => {
+                        const productCard = document.createElement("div");
+                        productCard.className = "store-product-card";
+                        
+                        let priceDisplay = product.is_on_sale 
+                            ? `<span class="current-price">$${product.sale_price.toFixed(2)}</span>
+                               <span class="original-price">$${product.price.toFixed(2)}</span>`
+                            : `<span class="current-price">$${product.price.toFixed(2)}</span>`;
+                        
+                        productCard.innerHTML = `
+                            <img src="${product.image_url}" alt="${product.name}" class="store-product-image">
+                            <div class="store-product-details">
+                                <div class="store-product-name">${product.name}</div>
+                                <div class="store-product-price">${priceDisplay}</div>
+                                <div class="store-product-store">${product.store_name}</div>
+                                <div class="store-product-actions">
+                                    <button class="store-add-to-cart-btn" onclick="Cart.addItem(${JSON.stringify(product).replace(/"/g, "&quot;")})>
+                                        Add to Cart
+                                    </button>
+                                    <button class="store-view-details-btn" onclick="window.open('${product.product_url}', '_blank')>
+                                        Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        storeProductsGrid.appendChild(productCard);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading recommended products:", error);
+                    storeProductsGrid.innerHTML = 
+                        '<div class="error-message">Failed to load recommended products. Please try again later.</div>';
+                });
+                
+            // Scroll to the recommendations
+            storeProductsContainer.scrollIntoView({ behavior: "smooth" });
+        }
+        
+        // Search and filter functionality
+        document.getElementById("store-search").addEventListener("input", filterProducts);
+        document.getElementById("store-filter").addEventListener("change", filterProducts);
+        document.getElementById("product-filter").addEventListener("change", filterProducts);
+        
+        function filterProducts() {
+            const searchTerm = document.getElementById("store-search").value.toLowerCase();
+            const storeFilter = document.getElementById("store-filter").value;
+            const productFilter = document.getElementById("product-filter").value;
+            
+            const productCards = document.querySelectorAll(".store-product-card");
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector(".store-product-name").textContent.toLowerCase();
+                const storeName = card.querySelector(".store-product-store").textContent.toLowerCase();
+                
+                const matchesSearch = productName.includes(searchTerm) || storeName.includes(searchTerm);
+                const matchesStore = storeFilter === "all" || storeName.includes(storeFilter.replace("-", " "));
+                const matchesProduct = productFilter === "all" || productName.includes(productFilter);
+                
+                if (matchesSearch && matchesStore && matchesProduct) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+        // Search and filter functionality
+        document.getElementById("store-search").addEventListener("input", filterProducts);
+        document.getElementById("store-filter").addEventListener("change", filterProducts);
+        document.getElementById("product-filter").addEventListener("change", filterProducts);
+        
+        function filterProducts() {
+            const searchTerm = document.getElementById("store-search").value.toLowerCase();
+            const storeFilter = document.getElementById("store-filter").value;
+            const productFilter = document.getElementById("product-filter").value;
+            
+            const productCards = document.querySelectorAll(".store-product-card");
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector(".store-product-name").textContent.toLowerCase();
+                const storeName = card.querySelector(".store-product-store").textContent.toLowerCase();
+                
+                const matchesSearch = productName.includes(searchTerm) || storeName.includes(searchTerm);
+                const matchesStore = storeFilter === "all" || storeName.includes(storeFilter.replace("-", " "));
+                const matchesProduct = productFilter === "all" || productName.includes(productFilter);
+                
+                if (matchesSearch && matchesStore && matchesProduct) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <script>
+        // Initialize the cart and load products
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cart
+            Cart.init();
+            
+            // Load products from API
+            fetch('/api/get_products')
+                .then(response => response.json())
+                .then(data => {
+                    renderProducts(data.products);
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    document.getElementById('products-container').innerHTML = 
+                        '<div class="error-message">Failed to load products. Please try again later.</div>';
+                });
+        });
+
+        // Toggle cart panel
+        function toggleCart() {
+            document.getElementById('cart-panel').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        // Render products in the grid
+        function renderProducts(products) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                let priceDisplay = '';
+                if (product.is_on_sale) {
+                    priceDisplay = `
+                        <div class="product-price">
+                            <span class="current-price">$${product.sale_price.toFixed(2)}</span>
+                            <span class="original-price">$${product.price.toFixed(2)}</span>
+                        </div><!-- End of cart panel -->
+                    `;
+                } else {
+                    priceDisplay = `
+                        <div class="product-price">
+                            <span class="current-price">$${product.price.toFixed(2)}</span>
+                        </div><!-- End of cart panel -->
+                    `;
+                }
+                
+                productCard.innerHTML = `
+                    <div class="store-badge">${product.store_name}</div>
+                    ${product.is_on_sale ? '<div class="sale-badge">SALE</div>' : ''}
+                    <img src="${product.image_url}" alt="${product.name}" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-name">${product.name}</h3>
+                        ${priceDisplay}
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" onclick="Cart.addItem(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                                Add to Cart
+                            </button>
+                            <button class="view-details-btn" onclick="window.open('${product.product_url}', '_blank')">
+                                Details
+                            </button>
+                        </div><!-- End of cart panel -->
+                    </div><!-- End of cart panel -->
+                `;
+                
+                container.appendChild(productCard);
+            });
+        }
+
+        // Checkout function
+        function checkout() {
+            const checkoutOptions = document.getElementById('checkout-options');
+            
+            if (checkoutOptions.style.display === 'none') {
+                // Show checkout options
+                checkoutOptions.style.display = 'block';
+                
+                // Get unique stores in cart
+                const storesInCart = Cart.getUniqueStores();
+                
+                // Clear previous options
+                checkoutOptions.innerHTML = '';
+                
+                // Add option for each store
+                storesInCart.forEach(store => {
+                    const storeOption = document.createElement('div');
+                    storeOption.className = 'checkout-option';
+                    storeOption.setAttribute('data-store', store.id);
+                    storeOption.onclick = function() {
+                        RetailerIntegration.redirectToStoreCheckout(store.id);
+                    };
+                    
+                    storeOption.innerHTML = `
+                        <div class="checkout-option-name">
+                            <img src="${store.logo_url}" alt="${store.name}" class="checkout-option-logo">
+                            <span>${store.name} ($${Cart.getStoreTotal(store.id).toFixed(2)})</span>
+                        </div><!-- End of cart panel -->
+                        <span class="checkout-option-arrow">→</span>
+                    `;
+                    
+                    checkoutOptions.appendChild(storeOption);
+                });
+            } else {
+                // Hide checkout options
+                checkoutOptions.style.display = 'none';
+            }
+        }
+        // Room scanning functionality
+        document.querySelector(".scan-room-btn").addEventListener("click", function() {
+            // Show scanning animation/progress
+            const roomToScan = document.querySelector(".room:not(.room-scanned)");
+            if (roomToScan) {
+                // Simulate scanning process
+                alert("Scanning room: " + roomToScan.querySelector(".room-name").textContent);
+                
+                // After scanning is complete (simulated with setTimeout)
+                setTimeout(function() {
+                    // Mark room as scanned
+                    roomToScan.classList.add("room-scanned");
+                    
+                    // Update scanned room count
+                    const scannedRooms = document.querySelectorAll(".room.room-scanned").length;
+                    const totalRooms = document.querySelectorAll(".room").length;
+                    document.querySelector(".stat-value:nth-child(3)").textContent = scannedRooms + "/" + totalRooms;
+                    
+                    // Generate recommended products for the room
+                    showRecommendedProducts(roomToScan.dataset.room);
+                }, 1500);
+            } else {
+                alert("All rooms have been scanned!");
+            }
+        });
+        
+        // Function to display recommended products
+        function showRecommendedProducts(roomType) {
+            // Display the store products container
+            const storeProductsContainer = document.getElementById("store-products-container");
+            storeProductsContainer.style.display = "block";
+            
+            // Clear existing products
+            const storeProductsGrid = document.getElementById("store-products-grid");
+            storeProductsGrid.innerHTML = "";
+            
+            // Fetch recommended products for the room type
+            // For now, we'll use some sample data
+            fetch("/api/recommended_products?room=" + roomType)
+                .then(response => response.json())
+                .then(data => {
+                    const recommendedProducts = data.products.slice(0, 5); // Only show 5 products
+                    
+                    // Add products to the grid
+                    recommendedProducts.forEach(product => {
+                        const productCard = document.createElement("div");
+                        productCard.className = "store-product-card";
+                        
+                        let priceDisplay = product.is_on_sale 
+                            ? `<span class="current-price">$${product.sale_price.toFixed(2)}</span>
+                               <span class="original-price">$${product.price.toFixed(2)}</span>`
+                            : `<span class="current-price">$${product.price.toFixed(2)}</span>`;
+                        
+                        productCard.innerHTML = `
+                            <img src="${product.image_url}" alt="${product.name}" class="store-product-image">
+                            <div class="store-product-details">
+                                <div class="store-product-name">${product.name}</div>
+                                <div class="store-product-price">${priceDisplay}</div>
+                                <div class="store-product-store">${product.store_name}</div>
+                                <div class="store-product-actions">
+                                    <button class="store-add-to-cart-btn" onclick="Cart.addItem(${JSON.stringify(product).replace(/"/g, "&quot;")})>
+                                        Add to Cart
+                                    </button>
+                                    <button class="store-view-details-btn" onclick="window.open('${product.product_url}', '_blank')>
+                                        Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        storeProductsGrid.appendChild(productCard);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading recommended products:", error);
+                    storeProductsGrid.innerHTML = 
+                        '<div class="error-message">Failed to load recommended products. Please try again later.</div>';
+                });
+                
+            // Scroll to the recommendations
+            storeProductsContainer.scrollIntoView({ behavior: "smooth" });
+        }
+        
+        // Search and filter functionality
+        document.getElementById("store-search").addEventListener("input", filterProducts);
+        document.getElementById("store-filter").addEventListener("change", filterProducts);
+        document.getElementById("product-filter").addEventListener("change", filterProducts);
+        
+        function filterProducts() {
+            const searchTerm = document.getElementById("store-search").value.toLowerCase();
+            const storeFilter = document.getElementById("store-filter").value;
+            const productFilter = document.getElementById("product-filter").value;
+            
+            const productCards = document.querySelectorAll(".store-product-card");
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector(".store-product-name").textContent.toLowerCase();
+                const storeName = card.querySelector(".store-product-store").textContent.toLowerCase();
+                
+                const matchesSearch = productName.includes(searchTerm) || storeName.includes(searchTerm);
+                const matchesStore = storeFilter === "all" || storeName.includes(storeFilter.replace("-", " "));
+                const matchesProduct = productFilter === "all" || productName.includes(productFilter);
+                
+                if (matchesSearch && matchesStore && matchesProduct) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+        // Search and filter functionality
+        document.getElementById("store-search").addEventListener("input", filterProducts);
+        document.getElementById("store-filter").addEventListener("change", filterProducts);
+        document.getElementById("product-filter").addEventListener("change", filterProducts);
+        
+        function filterProducts() {
+            const searchTerm = document.getElementById("store-search").value.toLowerCase();
+            const storeFilter = document.getElementById("store-filter").value;
+            const productFilter = document.getElementById("product-filter").value;
+            
+            const productCards = document.querySelectorAll(".store-product-card");
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector(".store-product-name").textContent.toLowerCase();
+                const storeName = card.querySelector(".store-product-store").textContent.toLowerCase();
+                
+                const matchesSearch = productName.includes(searchTerm) || storeName.includes(searchTerm);
+                const matchesStore = storeFilter === "all" || storeName.includes(storeFilter.replace("-", " "));
+                const matchesProduct = productFilter === "all" || productName.includes(productFilter);
+                
+                if (matchesSearch && matchesStore && matchesProduct) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

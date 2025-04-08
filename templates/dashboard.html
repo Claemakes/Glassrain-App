@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassRain - Dashboard</title>
+    <style>
+        /* GlassRain Color Scheme */
+        :root {
+            --glassrain-gold: #C29E49;
+            --midnight-black: #1A1A1A;
+            --rain-slate: #2E2E2E;
+            --cloud-white: #F8F8F8;
+            --mist-gray: #E5E5E5;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cloud-white);
+            color: var(--midnight-black);
+        }
+
+        /* Header */
+        header {
+            background-color: var(--midnight-black);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--glassrain-gold);
+        }
+
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-tab {
+            padding: 8px 15px;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--glassrain-gold);
+        }
+
+        .nav-tab.active {
+            color: var(--glassrain-gold);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--glassrain-gold);
+        }
+
+        /* Dashboard Content */
+        .dashboard-container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-banner {
+            background-color: var(--rain-slate);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--glassrain-gold);
+        }
+
+        .welcome-message {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-banner .btn {
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .welcome-banner .btn:hover {
+            background-color: #d4b05e;
+        }
+
+        /* Dashboard Sections */
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--glassrain-gold);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .card-link {
+            color: var(--glassrain-gold);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 3D Home Placeholder */
+        .home-3d-container {
+            width: 100%;
+            height: 400px;
+            background-color: var(--rain-slate);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .home-3d-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .home-3d-controls {
+            position: absolute;
+            bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .home-3d-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .home-3d-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Go Inside Button */
+        .go-inside-btn {
+            position: absolute;
+            bottom: 80px;
+            background-color: var(--glassrain-gold);
+            color: var(--midnight-black);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .go-inside-btn:hover {
+            background-color: #d4b05e;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">GlassRain</div>
+        <nav class="nav-tabs">
+            <a href="/dashboard" class="nav-tab active">Home</a>
+            <a href="/elevate" class="nav-tab">Elevate</a>
+            <a href="/services" class="nav-tab">Services</a>
+            <a href="/diy" class="nav-tab">DIY</a>
+            <a href="/settings" class="nav-tab">Account</a>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="welcome-banner">
+            <h1 class="welcome-title">Welcome to GlassRain</h1>
+            <p class="address-message" id="address-display" style="margin-top: 5px; font-size: 16px;"></p>
+            <p class="welcome-message" id="welcome-message">Your home transformation journey begins here. Explore our services, find products, and visualize your dream space.</p>
+            <p class="address-message" id="address-display" style="margin-top: 5px; font-size: 16px;"></p>
+            <a href="/elevate" class="btn">Explore Elevate Shop</a>
+        </div>
+
+        <!-- 3D Home Visualization Placeholder -->
+        <div class="home-3d-container">
+            <div class="home-3d-icon">🏠</div>
+            <h2>Your Home's 3D Model</h2>
+            <p>Rotate, zoom, and explore your home in 3D</p>
+            
+            <button class="go-inside-btn" onclick="window.location.href='/elevate'">Go Inside</button>
+            
+            <div class="home-3d-controls">
+                <button class="home-3d-btn" title="Rotate Left">↺</button>
+                <button class="home-3d-btn" title="Zoom In">+</button>
+                <button class="home-3d-btn" title="Zoom Out">-</button>
+                <button class="home-3d-btn" title="Rotate Right">↻</button>
+            </div>
+        </div>
+
+        <h2 class="section-title">Recommended Services</h2>
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/994/994928.png" alt="Cleaning" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">Professional Cleaning</h3>
+                    <p class="card-description">Get your home spotlessly clean with our professional cleaning services.</p>
+                    <a href="/services" class="card-link">Learn more →</a>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/1518/1518914.png" alt="Landscaping" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">Lawn Care</h3>
+                    <p class="card-description">Keep your yard looking beautiful with our lawn care services.</p>
+                    <a href="/services" class="card-link">Learn more →</a>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/1001/1001003.png" alt="Painting" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">Interior Painting</h3>
+                    <p class="card-description">Transform your rooms with a fresh coat of paint.</p>
+                    <a href="/services" class="card-link">Learn more →</a>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Popular Products</h2>
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <img src="https://m.media-amazon.com/images/I/71KHUOLd95L._AC_SL1500_.jpg" alt="Coffee Table" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">Mid-Century Coffee Table</h3>
+                    <p class="card-description">Stylish wooden coffee table with storage.</p>
+                    <a href="/elevate" class="card-link">Shop now →</a>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <img src="https://images.homedepot-static.com/productImages/d1f618c4-7b9e-4078-b3d3-b5c8c8a46c9d/svn/chrome-home-decorators-collection-ceiling-lights-38887-64_1000.jpg" alt="LED Light" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">LED Ceiling Light</h3>
+                    <p class="card-description">Energy-efficient LED ceiling fixture.</p>
+                    <a href="/elevate" class="card-link">Shop now →</a>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <img src="https://mobileimages.lowes.com/productimages/7e36fb8a-f2f9-470b-9c7f-ea9271dab31d/15394358.jpg" alt="Floor Lamp" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">Floor Lamp</h3>
+                    <p class="card-description">Adjustable reading floor lamp.</p>
+                    <a href="/elevate" class="card-link">Shop now →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load cart integration script -->
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+</body>
+</html>
+
+    <script>
+        // Load address information when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have a current address ID
+            const addressId = localStorage.getItem('currentAddressId');
+            if (addressId) {
+                // Fetch address details from the API
+                fetch('/api/addresses')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.addresses && data.addresses.length > 0) {
+                            // Find the address by ID
+                            const address = data.addresses.find(addr => addr.id == addressId) || data.addresses[0];
+                            
+                            if (address) {
+                                // Display the address
+                                const addressDisplay = document.getElementById('address-display');
+                                if (addressDisplay) {
+                                    addressDisplay.innerHTML = `<strong>Current Address:</strong> ${address.full_address || address.street + ', ' + address.city + ', ' + address.state + ' ' + address.zip}`;
+                                    
+                                    // Update welcome message
+                                    const welcomeMessage = document.getElementById('welcome-message');
+                                    if (welcomeMessage) {
+                                        welcomeMessage.textContent = 'Your home has been added to GlassRain. Explore our services, find products, and visualize your dream space.';
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching addresses:', error);
+                    });
+            }
+        });
+    </script>
