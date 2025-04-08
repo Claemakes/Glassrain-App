@@ -1,3 +1,5 @@
+
+
 """
 GlassRain API Server - Unified Solution
 
@@ -16,6 +18,11 @@ from decimal import Decimal
 from flask import Flask, jsonify, request, render_template, redirect, send_from_directory
 from psycopg2.extras import RealDictCursor
 from api_endpoint_for_checkout import add_retailer_checkout_endpoint
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return "GlassRain is running!"
 
 # Configure logging
 logging.basicConfig(
